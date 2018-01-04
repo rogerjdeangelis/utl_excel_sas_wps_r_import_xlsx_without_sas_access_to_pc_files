@@ -109,3 +109,102 @@ SAS WPS R Import XLSX without SAS access to PC-FIles Keywords: sas sql join merg
 
     proc print data=wantwps;
     run;quit;
+
+
+    *                                     _       _
+    __      ___ __  ___   _   _ _ __   __| | __ _| |_ ___
+    \ \ /\ / / '_ \/ __| | | | | '_ \ / _` |/ _` | __/ _ \
+     \ V  V /| |_) \__ \ | |_| | |_) | (_| | (_| | ||  __/
+      \_/\_/ | .__/|___/  \__,_| .__/ \__,_|\__,_|\__\___|
+             |_|               |_|
+    ;
+
+    With perhaps the exception of WPS Express, but for all versions at v3.3
+    or higher of WPS and running on any for the following OS platforms
+    AIX
+    Linux on ARM
+    Linux on System P
+    Linux on x86
+    Mac OS
+    Solaris on SPARC and X86
+    Windows
+    Linux on System z
+    And z/OS on System z
+    I'd opt for the XLSX access engine that is included as part of the license.
+    It's just easier and in my opinion more portable. You don’t need the MS data
+    access engines and you get cross-platform compatibility. The other bonus is
+    that you don’t have to worry whether the customer has R installed.
+    Also, PROC IMPORT and PROC Export are part of the base package and
+    can utilize the XLSX engine.
+    /*************** Code ***************/
+      data a;
+        do ii=1 to 10;
+        x=ranuni(0); y=rannor(0); z=ranuni(0);
+        output;
+      end;
+      run;
+      libname mylib xlsx 'c:\temp\simple.xlsx' replace;
+      data mylib.simple1;
+      set a;
+      run;
+      proc print data=mylib.simple1;
+      run;
+      data b; set mylib.simple1;
+      xyz=sum(of x y z);
+      run;
+    /**************** LOG ******************/
+    342         data a;
+    343           do ii=1 to 10;
+    344           x=ranuni(0); y=rannor(0); z=ranuni(0);
+    345           output;
+    346         end;
+    347         run;
+    NOTE: Data set "WORK.a" has 10 observation(s) and 4 variable(s)
+    NOTE: The data step took :
+          real time : 0.007
+          cpu time  : 0.000
+    348
+    349
+    350         libname mylib xlsx 'c:\temp\simple1.xlsx' replace;
+    NOTE: Library mylib assigned as follows:
+          Engine:        XLSX
+          Physical Name: c:\temp\simple1.xlsx
+    351
+    352         data mylib.simple1;
+    353         set a;
+    354         run;
+    NOTE: A Sheet named simple1 already exists in the workbook, and will be overwritten.
+    NOTE: Attempting to clear data in sheet simple1 (note, this does not delete the sheet itself)
+    NOTE: 10 observations were read from "WORK.a"
+    NOTE: Data set "MYLIB.simple1" has 10 observation(s) and 4 variable(s)
+    NOTE: The data step took :
+          real time : 0.006
+          cpu time  : 0.000
+    355
+    356         proc print data=mylib.simple1;
+    357         run;
+    NOTE: 10 observations were read from "MYLIB.simple1"
+    NOTE: Procedure print step took :
+          real time : 0.010
+          cpu time  : 0.000
+    359         data b; set mylib.simple1;
+    360         xyz=sum(of x y z);
+    361         run;
+    NOTE: 10 observations were read from "MYLIB.simple1"
+    NOTE: Data set "WORK.b" has 10 observation(s) and 5 variable(s)
+    NOTE: The data step took :
+          real time : 0.009
+          cpu time  : 0.015
+    NOTE: DATA statement used (Total process time):
+          real time           0.02 seconds
+          user cpu time       0.00 seconds
+          system cpu time     0.03 seconds
+          memory              240.15k
+          OS Memory           18412.00k
+          Timestamp           01/04/2018 03:57:47 PM
+          Step Count                        468  Switch Count  0
+
+
+    2957  ;;;;
+
+
